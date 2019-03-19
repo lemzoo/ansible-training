@@ -1,11 +1,15 @@
 [load-balancer]
 10.20.1.2
+
 [front-end]
 10.20.1.3
+
 [rest-servers]
 10.20.1.4
 10.20.1.5
+
 [db-servers]
 master-db-server ansible_host=10.20.1.6
+
 [admin]
 master-admin-server ansible_host=10.20.1.7

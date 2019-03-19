@@ -1,7 +1,7 @@
-DAY 1: 19-03-2019
+DAY 2: 19-03-2019
 =================
 
-RESUME:
+Summary:
 
     Disable gathering facts if not necessary.
     By default, it's enabled. 

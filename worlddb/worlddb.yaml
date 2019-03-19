@@ -1,0 +1,113 @@
+---
+- hosts: db-servers
+  become: true
+
+  vars:
+    postgres_dir: /var/lib/postgresql
+    pgdata_dir: "{{postgres_dir}}/pgdata"
+    db_group: postgres
+    db_user: postgres
+    db_shell: /usr/bin/psql
+    db_service: postgresql
+    postgres_conf: /var/lib/postgresql/pgdata/postgresql.conf
+    db_name: worlddb
+
+  tasks:
+    - name: Ensure the postgesql group exists
+      group:
+        name: "{{db_group}}"
+        state: present
+
+    - name: Ensure postgres user is available
+      user:
+        name: "{{db_user}}"
+        state: present
+        password: $6$n2cIcBvvsu2WmIGh$fQ1s9GI/4sv/HRJe85OJ5ltXil0hvBBxHpvJsQACv/8uq9Njh3LetEUROc3qDlmGUl6NaP27SDHyj7vAd/GRP0
+        groups: "{{db_group}}"
+        home: "{{postgres_dir}}"
+        shell: "{{db_shell}}"
+
+    - name: Ensure the home directory exists
+      file:
+        path: "{{postgres_dir}}"
+        state: directory
+        owner: "{{db_user}}"
+        group: "{{db_group}}"
+
+    - name: Ensure theses package are installed
+      package:
+        name:
+          - postgresql-server
+          - postgresql-contrib
+        state: present
+
+    - name: Ensure postgres service is enabled
+      service:
+        name: "{{db_service}}"
+        enabled: true
+
+    - name: Ensure service postgresql is configured with the right PGDATA
+      ini_file:
+        path: /etc/systemd/system/postgresql.service.d/pgdata.conf
+        section: Service
+        option: Environment
+        value: PGDATA={{pgdata_dir}}
+        create: yes
+
+    - name: Restart systemd service
+      systemd:
+        name: "{{db_service}}"
+        daemon_reload: true
+
+    - name: Ensure database is initialized
+      command: postgresql-setup initdb
+      become_user: "{{db_user}}"
+      args:
+        creates: "{{postgres_conf}}"
+
+    - name: Ensure all ports are listened
+      lineinfile:
+        path: "{{postgres_conf}}"
+        regexp: '^#?listen_addresses'
+        line: "listen_addresses = '*'"
+
+    - name: Ensure password login is allowed
+      lineinfile:
+        path: /var/lib/postgresql/pgdata/pg_hba.conf
+        line: 'host    all             all             0.0.0.0/0                md5'
+        create: true
+
+    - name: Ensure Postgresql server is restarted
+      service:
+        name: "{{db_service}}"
+        state: restarted
+
+    - name: Ensure database is created
+      postgresql_db:
+        name: "{{db_name}}"
+        state: present
+      become_user: "{{db_user}}"
+
+    - name: Ensure sql file is copied
+      copy:
+        src: ./files/structure.sql
+        dest: /tmp/structure.sql
+      become_user: "{{db_user}}"
+
+    - name: Ensure database is populated
+      postgresql_db:
+        name: "{{db_name}}"
+        state: restore
+        target: /tmp/structure.sql
+      become_user: postgres
+
+    - name: Ensure database user is create
+      postgresql_user:
+        name: student
+        state: present
+        db: "{{db_name}}"
+        password: masterkey
+        priv: "CONNECT/city:ALL/country:ALL/countrylanguage:ALL"
+      become_user: postgres
+
+
