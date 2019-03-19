@@ -5,25 +5,25 @@
   vars:
     postgres_dir: /var/lib/postgresql
     pgdata_dir: "{{postgres_dir}}/pgdata"
-    db_group: postgres
-    db_user: postgres
+    postgres_group: postgres
+    postgres_user: postgres
     db_shell: /usr/bin/psql
-    db_service: postgresql
+    postgres_service: postgresql
     postgres_conf: /var/lib/postgresql/pgdata/postgresql.conf
     db_name: worlddb
 
   tasks:
     - name: Ensure the postgesql group exists
       group:
-        name: "{{db_group}}"
+        name: "{{postgres_group}}"
         state: present
 
     - name: Ensure postgres user is available
       user:
-        name: "{{db_user}}"
+        name: "{{postgres_user}}"
         state: present
         password: $6$n2cIcBvvsu2WmIGh$fQ1s9GI/4sv/HRJe85OJ5ltXil0hvBBxHpvJsQACv/8uq9Njh3LetEUROc3qDlmGUl6NaP27SDHyj7vAd/GRP0
-        groups: "{{db_group}}"
+        groups: "{{postgres_group}}"
         home: "{{postgres_dir}}"
         shell: "{{db_shell}}"
 
@@ -31,8 +31,8 @@
       file:
         path: "{{postgres_dir}}"
         state: directory
-        owner: "{{db_user}}"
-        group: "{{db_group}}"
+        owner: "{{postgres_user}}"
+        group: "{{postgres_group}}"
 
     - name: Ensure theses package are installed
       package:
@@ -43,7 +43,7 @@
 
     - name: Ensure postgres service is enabled
       service:
-        name: "{{db_service}}"
+        name: "{{postgres_service}}"
         enabled: true
 
     - name: Ensure service postgresql is configured with the right PGDATA
@@ -56,12 +56,12 @@
 
     - name: Restart systemd service
       systemd:
-        name: "{{db_service}}"
+        name: "{{postgres_service}}"
         daemon_reload: true
 
     - name: Ensure database is initialized
       command: postgresql-setup initdb
-      become_user: "{{db_user}}"
+      become_user: "{{postgres_user}}"
       args:
         creates: "{{postgres_conf}}"
 
@@ -79,27 +79,27 @@
 
     - name: Ensure Postgresql server is restarted
       service:
-        name: "{{db_service}}"
+        name: "{{postgres_service}}"
         state: restarted
 
     - name: Ensure database is created
       postgresql_db:
         name: "{{db_name}}"
         state: present
-      become_user: "{{db_user}}"
+      become_user: "{{postgres_user}}"
 
     - name: Ensure sql file is copied
       copy:
         src: ./files/structure.sql
         dest: /tmp/structure.sql
-      become_user: "{{db_user}}"
+      become_user: "{{postgres_user}}"
 
     - name: Ensure database is populated
       postgresql_db:
         name: "{{db_name}}"
         state: restore
         target: /tmp/structure.sql
-      become_user: postgres
+      become_user: "{{postgres_user}}"
 
     - name: Ensure database user is create
       postgresql_user:
@@ -108,6 +108,6 @@
         db: "{{db_name}}"
         password: masterkey
         priv: "CONNECT/city:ALL/country:ALL/countrylanguage:ALL"
-      become_user: postgres
+      become_user: "{{postgres_user}}"
 
 
