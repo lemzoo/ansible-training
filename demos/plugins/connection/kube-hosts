@@ -1,0 +1,9 @@
+httpbin ansible_connection=kubectl ansible_python_interpreter=/usr/bin/python3
+
+[all:vars]
+ansible_connection=kubectl
+kubectl_namespace=default
+kubectl_cert_file=$HOME/.minikube/client.crt
+kubectl_key_file=$HOME/.minikube/client.key
+kubectl_ssl_ca_cert=$HOME/.minikube/ca.crt
+kubectl_host=192.168.99.100

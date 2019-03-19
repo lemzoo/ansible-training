@@ -1,0 +1,36 @@
+- hosts: front-end
+  become: yes
+  vars:
+    www_dir: /var/www/world
+  tasks:
+  - import_role:
+      name: geerlingguy.nginx
+    vars:
+      nginx_server_tokens: "off"
+      nginx_client_max_body_size: "20m"
+      nginx_extra_http_options: |
+              map $sent_http_content_type $expires {
+                  default                    off;
+                  text/html                  epoch;
+                  text/css                   max;
+                  application/javascript     max;
+                  ~image/                    max;
+              }
+      nginx_remove_default_vhost: true
+      nginx_vhosts:
+        - listen: "80"
+          server_name: localhost
+          root: "{{www_dir}}"
+      extra_parameters: expires $expires;
+  - name: Ensure html directory is available
+    file:
+      path: "{{www_dir}}"
+      state: directory
+  - name: Ensure the html files are available
+    copy:
+      src: files/index.html
+      dest: "{{www_dir}}"
+  - name: Ensure the front-end Javascript is available
+    copy:
+      src: files/front-end-opt.js
+      dest: "{{www_dir}}/js/"

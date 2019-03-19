@@ -1,0 +1,23 @@
+- name: Jinja filters
+  hosts: localhost
+  vars:
+    x: 10
+    somelist:
+      - 10
+      - 20
+      - 4
+      - 98
+
+  tasks:
+    - name: Default values
+      debug:
+        msg: x={{x}}, y={{y | default(5)}}
+    - name:
+      debug:
+        msg: min in list ={{somelist | min}}
+    - name: Flatten
+      debug:
+        msg: "flatten {{ [3, [4, [2]] ]| flatten}}"
+    - name: Flatten, level 1
+      debug:
+        msg: "flatten level 1 {{ [3, [4, [2]] ]|flatten(levels=1) }}"

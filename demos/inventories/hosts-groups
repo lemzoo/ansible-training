@@ -1,0 +1,13 @@
+[all]
+mail.example.com
+
+[webservers]
+web-1.example.com
+web-2.example.com
+monaco.example.com
+
+[dbservers]
+psql-1.example.com
+psql-2.example.com
+psql-3.example.com
+monaco.example.com

@@ -1,0 +1,5 @@
+- hosts: front-end
+- hosts: rest-servers
+- hosts: load-balancer
+  become: true
+  tasks:

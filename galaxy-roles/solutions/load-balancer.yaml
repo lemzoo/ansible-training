@@ -1,0 +1,65 @@
+- hosts: front-end
+- hosts: rest-servers
+- hosts: load-balancer
+  become: true
+  tasks:
+  - name: Ensure policycoreutils-python is installed
+    package:
+      name: policycoreutils-python
+  - name: Allow nginx to listen on tcp port 9090
+    seport:
+      ports: 9090
+      proto: tcp
+      setype: http_port_t
+      state: present
+  - import_role:
+      name: geerlingguy.nginx
+    vars:
+      nginx_server_tokens: "off"
+      nginx_remove_default_vhost: true
+      nginx_upstreams:
+        - name: front-end
+          servers: |
+              {
+                {% for host in groups[ 'front-end' ] %}
+                         "{{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}",
+                {% endfor %}
+              }
+        - name: rest-servers
+          servers: |
+              {
+                {% for host in groups[ 'rest-servers' ] %}
+                         "{{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}",
+                {% endfor %}
+              }
+      nginx_vhosts:
+        - listen: 80
+          server_name: web
+          extra_parameters: |
+            location / {
+                proxy_pass http://front-end;
+            }
+            error_page   500 502 503 504  /50x.html;
+               location = /50x.html {
+                 root   /usr/share/nginx/html;
+             }
+        - listen: 9090
+          server_name: api
+          extra_parameters: |
+            location / {
+                proxy_pass http://rest-servers;
+                proxy_set_header        X-Real-IP          $remote_addr;
+                proxy_set_header        X-Forwarded-Port   9090;
+                proxy_set_header        X-Forwarded-Host   $host:9090;
+                proxy_set_header        X-Forwarded-Server $host;
+                proxy_set_header        X-Forwarded-Proto  http;
+            }
+
+
+
+
+
+
+
+
+

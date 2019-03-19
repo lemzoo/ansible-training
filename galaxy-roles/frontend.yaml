@@ -1,0 +1,17 @@
+- hosts: front-end
+  become: yes
+  vars:
+    www_dir: /var/www/world
+  tasks:
+  - name: Ensure html directory is available
+    file:
+      path: "{{www_dir}}"
+      state: directory
+  - name: Ensure the html files are available
+    copy:
+      src: files/index.html
+      dest: "{{www_dir}}"
+  - name: Ensure the front-end Javascript is available
+    copy:
+      src: files/front-end-opt.js
+      dest: "{{www_dir}}/js/"

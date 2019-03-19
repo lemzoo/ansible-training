@@ -1,0 +1,19 @@
+all:
+  children:
+    db:
+      hosts:
+        10.20.1.6:
+    front:
+      hosts:
+        10.20.1.3:
+    rest:
+      hosts:
+        10.20.1.4:
+        10.20.1.5:
+    vagrant:
+      vars:
+        ansible_user: vagrant
+      children:
+        front:
+        rest:
+

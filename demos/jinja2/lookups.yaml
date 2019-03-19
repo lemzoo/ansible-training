@@ -1,0 +1,30 @@
+- name: Jinja
+  hosts: localhost
+  vars:
+    hosts: "{{lookup('file','/etc/hosts')}}"
+    lines: "{{lookup('lines','cat /etc/hosts', wantlist=true)}}"
+    qlines: "{{query('lines','cat /etc/hosts')}}"
+  tasks:
+  - name: lookup file
+    debug:
+      msg: "hosts: {{hosts}}"
+  - name: lookup lines
+    debug:
+      msg: "1st line: {{lines | first}}"
+  - name: Traditional loop over
+    debug:
+      msg:  "traditonal item: {{item}}"
+    with_lines: cat /etc/hosts
+  - name: query lines
+    debug:
+      msg: "1st qline: {{qlines | first}}"
+  - name: new loop over
+    debug:
+      msg:  "new item: {{item}}"
+    loop: "{{query('lines', 'cat /etc/hosts')}}"
+ - name: simple loop
+   debug:
+     msg: "simple item {{item}}"
+   loop:
+     - foo
+     - bar

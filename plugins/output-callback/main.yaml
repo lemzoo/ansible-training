@@ -1,0 +1,9 @@
+- hosts: front-end
+  become: yes
+  tasks:
+    - name: Write to file
+      blockinfile:
+        block: |
+          doesn't really matter
+        des: /etc/foobar.conf
+        create: false

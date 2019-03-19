@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  remote_user: root
+  tasks:
+    - debug:
+        msg: "1st task"
+      changed_when: True
+      notify: PB-HANDLER
+    - import_role:
+        name: simple
+    - debug:
+        msg: "last task"
+  handlers:
+    - name: pb-handler
+      debug:
+        msg: "pb handler called"
+      listen: PB-HANDLER

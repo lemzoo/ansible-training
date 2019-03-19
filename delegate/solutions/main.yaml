@@ -1,0 +1,69 @@
+- hosts: rest-servers
+  become: true
+  vars:
+    ca_key: ssl/ca-key.pem
+    ca_cert: ssl/ca-cert.pem
+    ca_csr: ssl/ca.csr
+    server_key: /etc/docker/server-key.pem
+    server_cert: /etc/docker/server-cert.pem
+    server_ca_cert: /etc/docker/my-ca-cert.pem
+    server_csr: /tmp/server.csr
+    local_server_cert: ssl/{{inventory_hostname}}-cert.pem
+    local_server_csr: ssl/{{inventory_hostname}}.csr
+    local_server_key: ssl/{{inventory_hostname}}-key.pem
+    client_cert: ssl/client-cert.pem
+    client_csr: ssl/client.csr
+    client_key: ssl/client-key.pem
+  tasks:
+    - import_tasks: ca.yaml
+      tags:
+        - config
+        - ssl
+    - import_tasks: server.yaml
+      tags:
+        - config
+        - ssl
+    - import_tasks: client.yaml
+      tags:
+        - config
+        - ssl
+    - name: Expose Docker API
+      ini_file:
+        path: /lib/systemd/system/docker.service
+        section: Service
+        option: ExecStart
+        value: "/usr/bin/dockerd -H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock --tlsverify --tlscert  {{server_cert}} --tlscacert {{server_ca_cert}} --tlskey {{server_key}}"
+        create: false
+      tags:
+        - config
+    - name: Reload and Restart dockerd
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+      tags:
+        - config
+    - name: install python
+      command: docker exec -it rest-countries apk add --update python
+      tags:
+        - config
+    - name: add container to inventory
+      add_host:
+        name: rest-countries-{{item}}
+        group: rest-countries-containers
+        ansible_connection: docker
+        ansible_host: rest-countries
+        ansible_docker_extra_args: --tlsverify --tlscacert={{ca_cert}} --tlscert={{client_cert}} --tlskey={{client_key}} -H=tcp://{{item}}:4243
+        ansible_user: root
+      loop: "{{groups['rest-servers']}}"
+    - name: Write a hello file
+      file:
+        path: /HELLO_FRIEND!!!
+        state: touch
+      delegate_to: "{{item}}"
+      loop: "{{groups['rest-countries-containers']}}"
+      run_once: true
+
+
+
+

@@ -1,0 +1,9 @@
+all:
+  children:
+    front:
+      hosts:
+        10.20.1.3:
+    rest:
+      hosts:
+        10.20.1.4:
+        10.20.1.5:

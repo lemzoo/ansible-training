@@ -1,0 +1,15 @@
+all:
+  vars:
+    ansible_user: vagrant
+  children:
+    front:
+      hosts:
+        10.20.1.3:
+      vars:
+        network_name: eth1
+    rest:
+      hosts:
+        10.20.1.4:
+        10.20.1.5:
+      vars:
+        network_name: eth0

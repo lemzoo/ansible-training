@@ -1,0 +1,23 @@
+---
+- name: Ensure
+  file:
+    path: /etc/td-agent/conf.d/
+    state: directory
+    owner: td-agent
+    group: td-agent
+- name: "Ensure td-agent.conf is available"
+  template:
+    src: td-agent.conf.j2
+    path: /etc/td-agent/td-agent.conf
+    backup: "{{backup_original_td_agent_conf}}"
+    owner: td-agent
+    group: td-agent
+  notify: RELOAD_TD_AGENT
+- name: Ensure fluentd can access tail tail_files
+  file:
+    path: "{{item.path}}"
+    mode: 0644
+  loop: "{{tail_files}}"  
+- name: Ensure ES plugin is installed
+  command: "td-agent-gem install fluent-plugin-elasticsearch"
+  notify: RELOAD_TD_AGENT

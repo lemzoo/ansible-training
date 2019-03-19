@@ -1,0 +1,20 @@
+server {
+
+   listen {{proxy.port}};
+
+   location / {
+       proxy_pass http://{{proxy.upstream}};
+       proxy_set_header        X-Real-IP          $remote_addr;
+       proxy_set_header        X-Forwarded-Port   {{proxy.port}};
+       proxy_set_header        X-Forwarded-Host   $host:{{proxy.port}};
+       proxy_set_header        X-Forwarded-Server $host;
+       proxy_set_header        X-Forwarded-Proto  http;
+   }
+
+   error_page   500 502 503 504  /50x.html;
+     location = /50x.html {
+       root   /usr/share/nginx/html;
+   }
+
+
+}

@@ -1,0 +1,7 @@
+---
+- import_playbook: ../../worldstack/solutions/worlddb.yaml
+- import_playbook: ../../worldstack/solutions/rest-server.yaml
+- import_playbook: frontend.yaml
+- import_playbook: ../../worldstack/solutions/load-balancer.yaml
+- import_playbook: logging.yaml
+- import_playbook: admin.yaml

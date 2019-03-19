@@ -1,0 +1,11 @@
+- name: Ensure nginx repo is availale
+  yum_repository:
+    name: nginx-repo
+    description: Official nginx repository
+    baseurl: http://nginx.org/packages/centos/$releasever/$basearch/
+    gpgcheck: false
+- name: Ensure nginx is installed
+  package:
+    name:
+      - nginx-1.14.0
+      - ca-certificates

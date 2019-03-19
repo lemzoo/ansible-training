@@ -1,0 +1,3 @@
+files:
+  - path: '/var/log/nginx/access.log'
+    type: 'nginx'

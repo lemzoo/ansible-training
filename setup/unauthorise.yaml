@@ -1,0 +1,10 @@
+---
+- hosts: all
+  vars:
+    home:  "{{ lookup('env','HOME') }}"
+  tasks:
+  - name: remove key from authorise keys
+    authorized_key:
+      user: vagrant
+      state: absent
+      key: "{{ lookup('file', '{{home}}/.ssh/id_rsa.pub') }}"

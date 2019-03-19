@@ -1,0 +1,26 @@
+---
+- hosts: all
+  user: vagrant
+  tasks:
+    - name: Ensure Java is available
+      package:
+        name: java-1.8.0-openjdk
+      become: yes
+    - name: Ensure SSL certificate from twitter.com is in the keystore
+      java_cert:
+        cert_url: twitter.com
+        cert_port: 443
+        keystore_path: "{{ssl_dir}}/certs/trust-store"
+        pkcs12_alias: twitter
+        keystore_pass: changeit
+        keystore_create: true
+        state: present
+      become: true
+#      ignore_errors: true
+    - name: Ensure Trust store is setup for certificate is used for foobar
+      lineinfile:
+        path: /home/vagrant/foobar.conf
+        line: trust-store={{ssl_dir}}/certs/trust-store
+        create: true
+
+

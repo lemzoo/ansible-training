@@ -1,0 +1,3 @@
+machine3 ansible_host=10.20.1.3
+machine4 ansible_host=10.20.1.4
+machine5 ansible_host=10.20.1.5

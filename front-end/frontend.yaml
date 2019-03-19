@@ -1,0 +1,3 @@
+- hosts: front-end
+  become: yes
+  tasks:

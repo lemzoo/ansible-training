@@ -1,0 +1,8 @@
+plugin: k8s
+label: foo
+connections:
+  - host: https://192.168.99.100:8443
+#    cert_file: /home/vagrant/.minikube/client.crt
+#    key_file: /home/vagrant/.minikube/client.key
+#    ssl_ca_cert: /home/vagrant/.minikube/ca.crt
+    namespaces: [default]

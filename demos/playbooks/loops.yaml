@@ -1,0 +1,13 @@
+- hosts: all
+  vars:
+    packages:
+      - docker
+      - jq
+  tasks:
+    - name: install
+      package:
+        name:
+          - docker
+          - jq
+          - vim
+      become: true

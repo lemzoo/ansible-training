@@ -1,0 +1,38 @@
+- hosts: db-servers
+- hosts: rest-servers
+  become: true
+  vars_files:
+    - vars/secrets.yaml
+  tasks:
+  - name: Enure docker repository is available
+    yum_repository:
+      name: docker-ce-stable
+      description: Docker CE Repository
+      baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+      gpgcheck: true
+      gpgkey: https://download.docker.com/linux/centos/gpg
+  - name: Ensure docker is installed
+    package:
+      name: docker-ce
+  - name: Ensure the docker daemon is enabled and started
+    service:
+      name: docker
+      enabled: true
+      state: started
+  - name:  Ensure docker-python is installed
+    pip:
+      name: docker-py
+  - name: Ensure a rest-countries container is running
+    docker_container:
+      name: rest-countries
+      image: edc4it/rest-countries:1.4
+      state: started
+      restart_policy: always
+      published_ports:
+        - "80:80"
+      env:
+        server.use-forward-headers: true
+        spring.datasource.url: jdbc:postgresql://{{hostvars['master-db-server']['ansible_eth1']['ipv4']['address']}}/worlddb
+        spring.datasource.username: student
+        spring.datasource.password: "{{worlddb_password}}"
+

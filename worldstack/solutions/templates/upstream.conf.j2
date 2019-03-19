@@ -1,0 +1,5 @@
+upstream {{ proxy.upstream }} {
+    {% for host in groups[ proxy.upstream ] %}
+       server {{ hostvars[host]['ansible_eth1']['ipv4']['address'] }};
+    {% endfor %}
+}

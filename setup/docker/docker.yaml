@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  become: true
+  tasks:
+    - package:
+        name: python2-dnf
+      when: ansible_pkg_mgr == 'dnf'
+    - import_role:
+        name: geerlingguy.pip
+    - import_role:
+        name: geerlingguy.docker
+      vars:
+        docker_users:
+          - "{{ user | default ('student')}}"
+    - name: Ensure python docker and docker-compose are installed
+      pip:
+        name:
+          - docker
+          - docker-compose
+

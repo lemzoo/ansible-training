@@ -1,0 +1,91 @@
+- hosts: db-servers
+  vars:
+    postgres_dir: "/var/lib/postgresql/"
+    pgdata_dir: "{{postgres_dir}}/pgdata"
+  become: true
+  tasks:
+  - name: Ensure the postgesql group exists
+    group:
+      name: postgres
+      state: present
+  - name: Ensure postgres user is available
+    user:
+      name: postgres
+      group: postgres
+      home: "{{postgres_dir}}"
+      shell: /usr/bin/psql
+      password: "$6$Ilymgtq78jeMY6wH$EI8OFFq07JHIAEj9E.2o6s5Wyd6xoBt/3EoJycggxyz1JpnIniBCpwl0wY/yYXymZhXDd0.EnpECKfwWI0O9s1"
+      append: true
+  - name: Ensure postgesql directory exists
+    file:
+      path: "{{postgres_dir}}"
+      state: directory
+      owner: postgres
+      group: postgres
+  - name: Ensure postgresql-server is installed
+    package:
+      name:
+        - postgresql-server
+        - postgresql-contrib
+  - name: Ensure the postgresql service is enabled
+    service:
+      name: postgresql
+      enabled: true
+  - name: Ensure PGDATA is set for the postgres service
+    ini_file:
+      path: /etc/systemd/system/postgresql.service.d/pgdata.conf
+      section: Service
+      option: Environment
+      value: PGDATA={{pgdata_dir}}
+      create: yes
+  - name: reload the daemon
+    systemd:
+      name: postgresql
+      daemon_reload: true
+  - name: Ensure Postgres is initialised
+    become: true
+    become_user: postgres
+    command:  postgresql-setup initdb
+    args:
+      creates: "{{pgdata_dir}}/postgresql.conf"
+  - name: Ensure Postgres is listening on all local ip addresses
+    lineinfile:
+      path: "{{pgdata_dir}}/postgresql.conf"
+      regexp: "^#?listen_addresses"
+      line: "listen_addresses = '*'"
+      state: present
+  - name: Ensure Postgres allows password authentication
+    lineinfile:
+      path: "{{pgdata_dir}}/pg_hba.conf"
+      line: "host    all             all             0.0.0.0/0                md5"
+  - name: Ensure Postgres is running
+    service:
+      name: postgresql
+      state: restarted
+  - name: Ensure the worlddb database is created
+    become: true
+    become_user: postgres
+    postgresql_db:
+      name: worlddb
+      state: present
+  - name:  copy sql file
+    copy:
+      src: files/structure.sql
+      dest: /tmp
+    become: true
+    become_user: postgres
+  - name: Ensure the worlddb database is initialised
+    become: true
+    become_user: postgres
+    postgresql_db:
+      name: worlddb
+      state: restore
+      target: /tmp/structure.sql
+  - name: Ensure the student database user is available
+    become: true
+    become_user: postgres
+    postgresql_user:
+      db: worlddb
+      name: student
+      password: masterkey
+      priv: "CONNECT/city:ALL/country:ALL/countrylanguage:ALL"

@@ -1,0 +1,12 @@
+plugin: virtualbox
+running_only: yes
+query:
+  vbox_version: /VirtualBox/HostInfo/VBoxVerExt
+  ansible_host: /VirtualBox/GuestInfo/Net/1/V4/IP
+  stack: /stack
+#groups:
+#  worldstack: stack == "worldstack"
+keyed_groups:
+  - prefix: ""
+    key: stack
+    separator: ""

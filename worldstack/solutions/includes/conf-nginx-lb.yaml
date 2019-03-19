@@ -1,0 +1,11 @@
+- set_fact:
+    proxy: "{{ item }}"
+- name: Ensure upstream servers are available
+  template:
+    src: templates/upstream.conf.j2
+    dest: /etc/nginx/conf.d/loadbalancer-{{proxy.upstream}}.conf
+- name: Forward requests to front-end servers
+  template:
+    src: templates/server.conf.j2
+    dest: /etc/nginx/conf.d/server-{{proxy.upstream}}.conf
+  notify: RELOAD_NGINX

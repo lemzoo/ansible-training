@@ -1,0 +1,54 @@
+- hosts: front-end
+  become: yes
+  tasks:
+  - include_tasks: includes/install-nginx.yaml
+  - name: Ensure nginx is started and enabled
+    service:
+      name: nginx
+      enabled: yes
+      state: started
+  - name: Ensure the html files are available
+    copy:
+      src: files/index.html
+      dest: /usr/share/nginx/html
+  - name: Ensure the front-end Javascript is available
+    copy:
+      src: files/front-end-opt.js
+      dest: /usr/share/nginx/html/js/
+  - name: Ensure hardened security is configured
+    blockinfile:
+      block: |
+        server_tokens off;
+        client_header_buffer_size   4k;
+        large_client_header_buffers 8 8k;
+        client_max_body_size 20m;
+        connection_pool_size 8192;
+        request_pool_size 8k;
+      path: /etc/nginx/conf.d/security.conf
+      create: true
+    notify: RELOAD_NGINX
+  - name: Ensure caching  is configured
+    blockinfile:
+      block: |
+        map $sent_http_content_type $expires {
+          default                    off;
+          text/html                  epoch;
+          text/css                   max;
+          application/javascript     max;
+          ~image/                    max;
+        }
+      path: /etc/nginx/conf.d/caching.conf
+      create: true
+    notify: RELOAD_NGINX
+  - name: Ensure expiration is enabled
+    lineinfile:
+      line: expires $expires;
+      path: /etc/nginx/conf.d/default.conf
+      insertbefore: "#error_page  404"
+    notify: RELOAD_NGINX
+  handlers:
+  - name: reload nginx
+    service:
+      name: nginx
+      state: reloaded
+    listen: RELOAD_NGINX

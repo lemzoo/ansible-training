@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  become: true
+  tasks:
+    - name: install packages
+      package:
+        name:
+          - curl
+          - vim
+          - git
+          - jq
+          - xclip
+          - python-pip
+          - ca-certificates
+          - chromium-browser
+          - g++
+          - golang-go
+          - net-tools
+    - name: Install pip packages
+      pip:
+        name:
+          - yq
+    - name: Download Virtualbox
+      get_url:
+        url: https://download.virtualbox.org/virtualbox/6.0.4/virtualbox-6.0_6.0.4-128413~Ubuntu~bionic_amd64.deb
+        dest: /home/student/Downloads/virtualbox.deb
+        checksum: sha256:b7d2cec180dd7c8ef05053ecb7d2fe5939bc52fca7f31fbfd65ae7a02bce402f
+    - name: Install virtualbox
+      apt:
+        deb: /home//student/Downloads/virtualbox.deb
+    - name: Download Vagrant
+      get_url:
+        url: https://releases.hashicorp.com/vagrant/2.2.4/vagrant_2.2.4_x86_64.deb
+        dest: /home/student/Downloads/vagrant.deb
+    - name: Install Vagrant
+      apt:
+        deb: /home/student/Downloads/vagrant.deb
+    - name: Install vagrant plugins
+      command: vagrant plugin install vagrant-shell-commander vagrant-vbguest
+    - name: Download Atom
+      get_url:
+        url: https://atom-installer.github.com/v1.34.0/atom-amd64.deb?s=1546643657&amp
+        dest: /home/student/Downloads/atom-amd64.deb
+    - name: Install Atom
+      apt:
+        deb: /home/student/Downloads/atom-amd64.deb
+    - name: Install Atom plugins
+      command: apm install -sq  language-docker file-icons language-ignore language-ansible
+      become: false

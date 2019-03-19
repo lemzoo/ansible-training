@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  tasks:
+    - include_tasks: includes/tasks.yaml
+      vars:
+         x: 10
+    - import_tasks: includes/tasks.yaml
+      vars:
+         x: 20

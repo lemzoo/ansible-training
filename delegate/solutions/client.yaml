@@ -1,0 +1,26 @@
+- name: create Client Key
+  local_action:
+    module: openssl_privatekey
+    path: "{{client_key}}"
+  become: false
+  run_once: true
+- name: Create the Client CSR
+  local_action:
+    module: openssl_csr
+    path: "{{client_csr}}"
+    privatekey_path: "{{client_key}}"
+    common_name: "{{inventory_hostname}}"
+  become: false
+  run_once: true
+- name: Create the Client Certificate
+  local_action:
+    module: openssl_certificate
+    path: "{{client_cert}}"
+    privatekey_path: "{{client_key}}"
+    csr_path: "{{client_csr}}"
+    ownca_path: "{{ca_cert}}"
+    ownca_privatekey_passphrase: ansible
+    ownca_privatekey_path: "{{ca_key}}"
+    provider: ownca
+  become: false
+  run_once: true

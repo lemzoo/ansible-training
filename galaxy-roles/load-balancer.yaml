@@ -1,0 +1,18 @@
+- hosts: front-end
+- hosts: rest-servers
+- hosts: load-balancer
+  become: true
+  tasks:
+  - name: Ensure policycoreutils-python is installed
+    package:
+      name: policycoreutils-python
+  - name: Allow nginx to listen on tcp port 9090
+    seport:
+      ports: 9090
+      proto: tcp
+      setype: http_port_t
+      state: present
+
+
+
+

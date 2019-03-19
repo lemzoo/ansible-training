@@ -1,0 +1,7 @@
+---
+ulimit: 65536
+backup_original_td_agent_conf: true
+tail_files: []
+es:
+  host: 127.0.0.1
+  port: 9200

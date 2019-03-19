@@ -1,0 +1,17 @@
+---
+- hosts: all
+  user: vagrant
+  vars:
+    x: 10
+    b: 1
+  tasks:
+  - name: capture output
+    command: whoami
+    register: vlogin
+  - set_fact:
+      a: "{{vlogin.stdout}}"
+      b: "{{b+1}}"
+  - debug: var=vlogin
+  - debug: var=ansible_distribution
+  - debug: var=a
+  - debug: var=b

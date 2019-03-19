@@ -1,0 +1,12 @@
+---
+- hosts: admin
+- hosts: load-balancer,rest-servers
+  tasks:
+    - import_role:
+        name: fluentd
+      vars:
+        tail_files: "{{files | default ([]) }}"
+        es:
+          host: "{{hostvars['master-admin-server']['ansible_eth1']['ipv4']['address']}}"
+          port: 9200
+      become: yes

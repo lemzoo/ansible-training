@@ -1,0 +1,11 @@
+---
+- name: Ensure TreasureData repo is availale
+  yum_repository:
+    name: TreasureData
+    description: TreasureData Repository
+    baseurl: http://packages.treasuredata.com/2.5/redhat/\$releasever/\$basearch
+    gpgcheck: true
+    gpgkey: https://packages.treasuredata.com/GPG-KEY-td-agent
+- name: Ensure td-agent  toolbelt are installed
+  package:
+    name: td-agent

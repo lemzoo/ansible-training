@@ -1,0 +1,17 @@
+---
+- hosts: all
+  user: vagrant
+  become: true
+  tasks:
+  - name: ensure https is at the latest version
+    package:
+      name: httpd
+      state: present
+  - name: ensure index page is there
+    copy:
+      src: resources/index.html
+      dest: /var/www/html
+  - name: ensure apache is running
+    service:
+      name: httpd
+      state: started

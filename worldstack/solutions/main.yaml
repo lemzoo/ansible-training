@@ -1,0 +1,5 @@
+---
+- import_playbook: worlddb.yaml
+- import_playbook: rest-server.yaml
+- import_playbook: frontend.yaml
+- import_playbook: load-balancer.yaml

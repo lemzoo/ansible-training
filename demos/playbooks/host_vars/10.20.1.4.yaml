@@ -1,0 +1,5 @@
+# for the strategies demo
+wait: 4s
+
+# for the error-handling demo
+ssl_dir: /etc/tls # does not exist

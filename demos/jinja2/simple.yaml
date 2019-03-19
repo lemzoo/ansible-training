@@ -1,0 +1,14 @@
+- name: Jinja
+  hosts: localhost
+  vars:
+    x: 10
+  tasks:
+    - name: values
+      debug:
+        msg: "x: {{x}}"
+    - name: conditional
+      debug:
+        msg: "x< 100: {{x<100}}"
+    - name: hostvars magic variable
+      debug:
+        msg: "ip: {{hostvars['localhost'].ansible_wlo1.ipv4.address}}"

@@ -1,0 +1,14 @@
+galaxy_info:
+  author: Student
+  description: Simple fluentd role
+
+  license: license (GPLv2, CC-BY, etc)
+
+  min_ansible_version: 1.2
+  platforms:
+  - name: CentOS
+    versions:
+    - 7
+
+dependencies:
+     - {role: geerlingguy.ruby, ruby_install_from_source: true, ruby_version: 2.5.1}

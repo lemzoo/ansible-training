@@ -1,0 +1,28 @@
+[
+  {
+    "id": "launch",
+    "execute-command": "curl",
+    "pass-arguments-to-command": [
+      {
+        "source": "string",
+        "name": "-X"
+      },
+      {
+        "source": "string",
+        "name": "POST"
+      },
+      {
+        "source": "string",
+        "name": "-u"
+      },
+      {
+        "source": "string",
+        "name": "admin:password"
+      },
+      {
+        "source": "string",
+        "name": "CHANGEME"
+      }
+    ]
+  }
+]

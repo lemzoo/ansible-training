@@ -1,0 +1,32 @@
+- name: Generate the Server Key
+  local_action:
+    module: openssl_privatekey
+    path: "{{local_server_key}}"
+  become: false
+- name: Generate the Server CSR
+  local_action:
+    module: openssl_csr
+    path: "{{local_server_csr}}"
+    subject_alt_name: "IP:{{inventory_hostname}}"
+    privatekey_path: "{{local_server_key}}"
+    common_name: "{{inventory_hostname}}"
+  become: false
+- name: Generate the Server Certificate
+  local_action:
+    module: openssl_certificate
+    path: "{{local_server_cert}}"
+    privatekey_path: "{{local_server_key}}"
+    csr_path: "{{local_server_csr}}"
+    ownca_path: "{{ca_cert}}"
+    ownca_privatekey_path: "{{ca_key}}"
+    ownca_privatekey_passphrase: ansible
+    provider: ownca
+  become: false
+- name: Copy files to server
+  copy:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+  loop:
+    - {src: "{{local_server_key}}" , dest: "{{server_key}}"  }
+    - {src: "{{local_server_cert}}", dest: "{{server_cert}}" }
+    - {src: "{{ca_cert}}", dest: "{{server_ca_cert}}" }

@@ -1,0 +1,24 @@
+- hosts: rest-servers
+  become: true
+  vars:
+    ca_key: ssl/ca-key.pem
+    ca_cert: ssl/ca-cert.pem
+    ca_csr: ssl/ca.csr
+    server_key: /etc/docker/server-key.pem
+    server_cert: /etc/docker/server-cert.pem
+    server_ca_cert: /etc/docker/my-ca-cert.pem
+    server_csr: /tmp/server.csr
+    local_server_cert: ssl/{{inventory_hostname}}-cert.pem
+    local_server_csr: ssl/{{inventory_hostname}}.csr
+    local_server_key: ssl/{{inventory_hostname}}-key.pem
+    client_cert: ssl/client-cert.pem
+    client_csr: ssl/client.csr
+    client_key: ssl/client-key.pem
+  tasks:
+    - import_tasks: ca.yaml
+    - import_tasks: server.yaml
+    - import_tasks: client.yaml
+
+
+
+

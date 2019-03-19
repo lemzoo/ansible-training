@@ -1,0 +1,42 @@
+---
+- hosts: admin
+  become: true
+  tasks:
+    - import_role:
+        name: elastic.elasticsearch
+      vars:
+        es_instance_name: course
+        es_heap_size: "512m"
+        es_xpack_features: ["alerting","monitoring","graph","ml"] # no security
+        es_config:
+          node.name: "course"
+          cluster.name: "custom-cluster"
+          discovery.zen.ping.unicast.hosts: "localhost:9301"
+          transport.tcp.port: 9301
+          http.port: 9200
+          network.host: 0.0.0.0
+    - name: Enure Kibana repository is available
+      yum_repository:
+        name: kibana-6.x
+        description: Kibana repository for 6.x packages
+        baseurl: https://artifacts.elastic.co/packages/6.x/yum
+        gpgcheck: true
+        gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    - name: Ensure kibana is installed
+      package:
+        name: kibana
+    - name: Ensure kibama is configured
+      copy:
+        src: files/kibana.yaml
+        dest: /etc/kibana/kibana.yml
+      notify: RELOAD_KIBANA
+    - name: Ensure  kibana is enabled and started
+      service:
+        name: kibana
+        enabled: true
+        state: started
+  handlers:
+    - name: RELOAD_KIBANA
+      service:
+        name: kibana
+        state: restart

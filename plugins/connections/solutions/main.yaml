@@ -1,0 +1,9 @@
+- hosts: all
+  tasks:
+    - name: Get flask version
+      command: flask --version
+      environment:
+        LC_ALL: C.UTF-8
+      register: version
+    - debug:
+        var: version.stdout_lines[0]

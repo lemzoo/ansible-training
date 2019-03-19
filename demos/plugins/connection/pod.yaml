@@ -1,0 +1,12 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: httpbin
+  annotations:
+    ansible_python_interpreter: "/usr/bin/python3"
+spec:
+  containers:
+    - name: httpbin
+      image: kennethreitz/httpbin
+
+

@@ -1,0 +1,4 @@
+---
+- hosts: admin
+- hosts: load-balancer,rest-servers
+  tasks:

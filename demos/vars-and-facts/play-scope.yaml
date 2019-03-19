@@ -1,0 +1,17 @@
+---
+- hosts: all
+  user: vagrant
+  vars:
+    host: proxy01.example.com
+    port_no: 8443
+    proxy_address: http://{{host}}:{{port_no}}
+  tasks:
+  - name: Ensure proxy set in .npmrc
+    blockinfile:
+      path: "{{ ansible_env.HOME }}/.npmrc"
+      block: |
+        proxy={{proxy_address | upper}}
+        https-proxy={{proxy_address | lower}}
+        marker: '# {mark} proxy settings'
+      insertbefore: EOF
+      create: yes

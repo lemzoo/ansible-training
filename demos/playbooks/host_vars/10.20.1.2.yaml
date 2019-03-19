@@ -1,0 +1,6 @@
+# for the strategies demo
+wait: 20s
+
+# for the error-handling demo
+ssl_dir: /etc/ssl
+

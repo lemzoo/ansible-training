@@ -1,0 +1,11 @@
+# Run this playbook with strategies.sh
+- hosts: all
+  strategy: free
+  tasks:
+  - name: First nap
+    command: sleep {{wait}}
+  - name: Second nap
+    command: sleep 7s
+  - name: done
+    debug:
+      msg: done {{ansible_hostname}}

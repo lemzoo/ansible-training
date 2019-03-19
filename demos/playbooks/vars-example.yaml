@@ -1,0 +1,13 @@
+- hosts: all
+  tasks:
+  - command: whoami
+    register: r1
+  - set_fact:
+      id: "{{r1.stdout}}"
+  - debug: var=id
+  - command: /usr/sbin/ip route list 10.0.2.0/24
+    register: r2
+  - set_fact:
+      route_ip: "{{r2.stdout.split()[8]}}"
+  - debug: var=route_ip
+

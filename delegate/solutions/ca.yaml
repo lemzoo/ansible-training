@@ -1,0 +1,29 @@
+- name: Generate a CA key
+  local_action:
+    module: openssl_privatekey
+    path: "{{ca_key}}"
+    type: RSA # default
+    size: 4096 # default
+    cipher: aes256
+    passphrase: ansible
+  become: false
+  run_once: true
+- name: Generate the CA CSR
+  local_action:
+    module: openssl_csr
+    path: "{{ca_csr}}"
+    basic_constraints: "CA:true"
+    common_name: "{{inventory_hostname}}"
+    privatekey_path: "{{ca_key}}"
+    privatekey_passphrase: ansible
+  become: false
+- name: Generate the CA Certificate
+  local_action:
+    module: openssl_certificate
+    path: "{{ca_cert}}"
+    csr_path: "{{ca_csr}}"
+    privatekey_path: "{{ca_key}}"
+    privatekey_passphrase: ansible
+    provider: selfsigned
+  run_once: true
+  become: false

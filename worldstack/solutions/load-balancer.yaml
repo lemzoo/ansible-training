@@ -1,0 +1,37 @@
+- hosts: front-end
+- hosts: rest-servers
+- hosts: load-balancer
+  become: true
+  tasks:
+  - include_tasks: includes/install-nginx.yaml
+  - name: Ensure policycoreutils-python is installed
+    package:
+      name: policycoreutils-python
+  - name: Allow nginx to listen on tcp port 9090
+    seport:
+      ports: 9090
+      proto: tcp
+      setype: http_port_t
+      state: present
+  - name: Ensure nginx is started and enabled
+    service:
+      name: nginx
+      enabled: yes
+      state: started
+  - name: Ensure default server is unavailable
+    file:
+      state: absent
+      path: /etc/nginx/conf.d/default.conf
+
+  - include_tasks: includes/conf-nginx-lb.yaml
+    loop:
+      - {upstream: front-end,  port: 80}
+      - {upstream: rest-servers,  port: 9090}
+    notify: RELOAD_NGINX
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded
+      listen: RELOAD_NGINX

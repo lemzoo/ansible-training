@@ -1,0 +1,27 @@
+- name: Jinja
+  hosts: localhost
+  vars:
+    x: 10
+    somelist:
+      - 10
+      - 20
+      - 4
+      - 98
+  tasks:
+    - name: if
+      debug:
+        msg: |
+            {% if x < 10 %}
+              x is less than 10 {{ x }}
+            {% else %}
+              x is too high
+            {% endif %}
+    - name: for
+      debug:
+        msg: |
+            <Proxy balancer://myset>  
+              {% for host in groups[ all ] %}
+                BalancerMember {{ hostvars[host]['ansible_eth1']['ipv4']['address'] }}
+              {% endfor %}
+              ProxySet lbmethod=bytraffic
+            </Proxy>

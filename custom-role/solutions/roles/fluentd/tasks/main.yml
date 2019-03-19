@@ -1,0 +1,12 @@
+---
+- import_tasks: prereqs.yml
+- import_tasks: install-with-yum.yml
+  when: ansible_pkg_mgr == "yum"
+
+- include_tasks: configure.yml
+
+- name: Ensure the td-agent  is enabled and started
+  service:
+    name: td-agent
+    enabled: true
+    state: started
