@@ -297,3 +297,59 @@ STEPPING one-by-step-at-a-time
 Make error messages easier to read
 
     ANSIBLE_STDOUT_CALLBACK=yaml ansible-playbook myplaybook.yml
+    
+HANDLERS:
+
+    PROBLEM
+        certain tasks require an action afterwards
+        tasks are idempotent
+        so how do we know if we need 
+    
+    Definition
+        Called zero or one time
+        Only when notified one or more times
+        At the end of the block
+        In the order they are defined
+        
+    Example:
+        ...
+        handlers:
+        - name: restart redis service
+          serivce: docker
+          state: restart
+          
+        Inside play
+        ---
+        tasks:
+          - name: configure redis authentication
+            ...
+            notify: restart redis service
+
+
+Trigerring handlers using 
+          
+    tasks:
+    - name: configure redis authentication
+      ...
+      notify: RESTART_REDIS
+    
+    handlers:
+    - namme: restart redis service
+      service:
+        name: docker
+        state: restart
+      listen: RESTART_REDIS
+      
+Dynamic Inventory example:
+
+    ansible
+    
+Ansible Plugins
+    
+    Enable via configuration
+    Possible to use a white list plugins
+    STDOUT
+    OTHERS()
+    
+Cache plugins
+
