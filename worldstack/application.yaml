@@ -1,0 +1,21 @@
+server:
+    port: 80
+spring:
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        username: ${POSTGRES_USERNAME}
+        password: ${POSTGRES_PASSWORD}
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:postgresql://worlddb/postgres
+        hikari:
+            connection-timeout: 60000
+            idle-timeout: 600000
+            max-lifetime: 1800000
+
+logging:
+    level:
+        ROOT: WARN
+        org.springframework: INFO
+        lab: INFO
+    pattern:
+      console: "%d{HH:mm:ss.SSS} [%thread] %-5level %cyan(%logger{0}) - %msg%n"

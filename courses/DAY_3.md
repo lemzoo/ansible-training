@@ -151,4 +151,99 @@ FORCE HANDLERS
         always:
           - name: Re-add webserver to the loadbalancer
           - ame: Remove a VM snapshot
+          
+# Open source server: emby (have a look), plex
+
+# Check also: pygments, ycube
       
+# Parallelisme:
+
+    Linear: By default, the parallelisme is set to 3.
+    Free: Use available worker to run the next task
+    Example: 
+    ---
+    hosts: all
+    strategy: free
+    
+    Batch: 
+    ---
+    hosts: all
+    serial: 3
+    
+
+Task delegation:
+================
+
+    Delegate run task on host inventory variables are kept
+    ---
+    hosts: webservers
+    serial: 1
+    tasks:
+        - name: disable nagios alerts for this host webservers service
+          nagios: 'action=disable_alerts host={{ inventory_hostname}}'
+          deletegate_to: nagios.example.com
+          
+        - name: disable the server in haproxy
+          haproxy: 'state=disabled hosts={{ inventory_hostname }}'
+          delegate_to: lb.example.com
+          
+
+TAGS:
+====
+
+    Only run specific part of play
+    
+    ---
+    tasks: 
+      - package:
+          - nginx
+          - mysql
+        tags:
+          - installation
+      - pip:
+          name: psycopg
+        tags:
+          - installation
+          
+     Tags type: always, never (useful for debug mode), untagged (all untagged tasks)
+          
+    Including tagged tasks
+    $ ansible-playbook -tags "configuration" provision.yml
+    
+ # Hae a lookup : Avoid creating .retry file after run playbook
+ 
+ Roles:
+ =====
+ 
+    Reusable playbook with defined structure by ansible
+    Structure:
+    myrole:                 role name
+     - defaults/            
+         - main.yml         defaults values for role variables/parameters
+     - vars/
+          - main.yml        additional variables
+     - files                files to deploy/copy
+     - templates            templates to deploy/copy
+     - tasks
+          - main.yml        task list (role's entry point)
+     - handlers
+           - main.yml       handlers to be triggered (by role and playbook)
+     - tests
+           - inventory.yml
+           - main.yml
+ 
+ Galaxy:
+ ======
+ 
+    Plateform to share roles
+    https://galaxy.ansible.com/
+    
+Ansible Tower with AWX:
+======================
+    
+    Has a REST API
+    SCM: Source Control Manager access
+
+Use module: firewalld
+
+          

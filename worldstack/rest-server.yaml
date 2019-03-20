@@ -1,3 +1,66 @@
 ---
+- hosts: rest-servers
+- hosts: db-servers
+  become: true
 
-...
+  vars_files:
+    - vars/secrets.yaml
+
+  vars:
+    docker_repository: https://download.docker.com/linux/centos/7/$basearch/stable
+    docker_image: edc4it/rest-countries:1.4
+    db_hostname: hostvars['master-db-server']['ansible_eth1']['ipv4']['address']
+    db_connection_str: jdbc:postgresql://{{db_hostname}}/worlddb
+    db_username: student
+    db_password: "{{ worlddb_password }}"
+
+  tasks:
+    - name: Ensure required packages are installed
+      package:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+        state: present
+
+    - name: Ensure the stable repository is set
+      yum_repository:
+        name: docker-ce-stable
+        description: Docker CE Stable - $basearch
+        baseurl: "{{ docker_repository}}"
+        gpgcheck: true
+        enabled: true
+        gpgkey: https://download.docker.com/linux/centos/gpg
+
+    - name: Ensure Docker CE is installed
+      package:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    - name: Ensure Docker is started
+      service:
+        name: docker
+        state: started
+
+    - name: Ensure python dependencies are installed
+      pip:
+        name: docker-py
+        state: present
+
+    - name: Ensure Docker Container is started
+      docker_container:
+        name: rest-contries
+        image: "{{ docker_image }}"
+        published_ports:
+          - "80:80"
+        restart_policy: always
+        env:
+          spring.datasource.url: "{{db_connection_str}}"
+          spring.datasource.username: "{{ db_username }}"
+          spring.datasource.password: "{{db_password}}"
+          server.use-forward-headers: "true"
+      tags:
+        - docker
