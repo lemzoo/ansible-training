@@ -73,3 +73,6 @@
         name: nginx
         state: reloaded
       listen: RELOAD_NGINX
+
+# Slack webhook url
+# https://hooks.slack.com/services/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

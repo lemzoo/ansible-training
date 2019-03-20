@@ -5,5 +5,5 @@
       blockinfile:
         block: |
           doesn't really matter
-        des: /etc/foobar.conf
-        create: false
+        path: /etc/foobar.conf
+        create: yes
